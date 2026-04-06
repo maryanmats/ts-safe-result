@@ -1,0 +1,61 @@
+{
+  "name": "ts-safe-result",
+  "version": "1.0.0",
+  "description": "A tiny, type-safe Result type for TypeScript. Handle errors as values, not exceptions.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "result",
+    "typescript",
+    "error-handling",
+    "type-safe",
+    "ok",
+    "err",
+    "neverthrow",
+    "either",
+    "monad",
+    "functional",
+    "try-catch",
+    "discriminated-union"
+  ],
+  "author": "Maryan Mats <matsmaryan@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maryanmats/ts-safe-result.git"
+  },
+  "homepage": "https://github.com/maryanmats/ts-safe-result#readme",
+  "bugs": {
+    "url": "https://github.com/maryanmats/ts-safe-result/issues"
+  },
+  "devDependencies": {
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.1"
+  }
+}
