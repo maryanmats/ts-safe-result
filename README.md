@@ -100,6 +100,28 @@ ok('abc').flatMap(parseAge);  // Err('Invalid number')
 err('missing').flatMap(parseAge); // Err('missing') — skipped
 ```
 
+#### `.tap(sideEffect)` — Inspect the value without transforming it
+
+Useful for logging or debugging within a chain:
+
+```typescript
+const user = await tryAsync(() => fetchUser(id))
+  .tap(user => console.log('Fetched:', user.name))
+  .map(user => user.email);
+// Side effect runs, but the Result stays unchanged
+```
+
+#### `.tapErr(sideEffect)` — Inspect the error without transforming it
+
+Useful for error reporting within a chain:
+
+```typescript
+const config = tryCatch(() => JSON.parse(rawConfig))
+  .tapErr(error => Sentry.captureException(error))
+  .unwrapOr(defaultConfig);
+// Error gets reported, but the chain continues
+```
+
 #### `.match({ ok, err })` — Exhaustive pattern matching
 
 Handle both cases explicitly — TypeScript ensures you cover both:

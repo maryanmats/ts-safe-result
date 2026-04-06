@@ -101,6 +101,61 @@ describe("match", () => {
   });
 });
 
+describe("tap", () => {
+  it("calls side effect for Ok", () => {
+    let captured = 0;
+    const result = ok(42).tap((value) => {
+      captured = value;
+    });
+    expect(captured).toBe(42);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value).toBe(42);
+  });
+
+  it("skips side effect for Err", () => {
+    let called = false;
+    err("fail").tap(() => {
+      called = true;
+    });
+    expect(called).toBe(false);
+  });
+
+  it("returns the same Result for chaining", () => {
+    const result = ok(10)
+      .tap(() => {})
+      .map((value) => value * 2);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value).toBe(20);
+  });
+});
+
+describe("tapErr", () => {
+  it("calls side effect for Err", () => {
+    let captured = "";
+    const result = err("something broke").tapErr((error) => {
+      captured = error;
+    });
+    expect(captured).toBe("something broke");
+    expect(result.ok).toBe(false);
+  });
+
+  it("skips side effect for Ok", () => {
+    let called = false;
+    ok(42).tapErr(() => {
+      called = true;
+    });
+    expect(called).toBe(false);
+  });
+
+  it("returns the same Result for chaining", () => {
+    const result = err("fail")
+      .tapErr(() => {})
+      .mapErr((error) => `wrapped: ${error}`);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe("wrapped: fail");
+  });
+});
+
 describe("unwrap", () => {
   it("returns value for Ok", () => {
     expect(ok(42).unwrap()).toBe(42);

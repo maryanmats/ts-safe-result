@@ -1,6 +1,6 @@
 {
   "name": "ts-safe-result",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A tiny, type-safe Result type for TypeScript. Handle errors as values, not exceptions.",
   "type": "module",
   "main": "./dist/index.cjs",

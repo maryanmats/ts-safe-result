@@ -3,42 +3,114 @@ export type Result<Value, Error> = Ok<Value, Error> | Err<Value, Error>;
 export interface Ok<Value, Error = never> {
   readonly ok: true;
   readonly value: Value;
+
+  /** Transform the success value. Skipped if this is an Err. */
   map<NewValue>(transform: (value: Value) => NewValue): Result<NewValue, Error>;
+
+  /** Transform the error value. Skipped if this is an Ok. */
   mapErr<NewError>(
     transform: (error: Error) => NewError,
   ): Result<Value, NewError>;
+
+  /**
+   * Chain a dependent operation that itself returns a Result.
+   * Useful when the next step can also fail.
+   */
   flatMap<NewValue, NewError>(
     transform: (value: Value) => Result<NewValue, NewError>,
   ): Result<NewValue, Error | NewError>;
+
+  /**
+   * Perform a side effect with the success value without transforming it.
+   * Useful for logging or analytics within a chain.
+   */
+  tap(sideEffect: (value: Value) => void): Result<Value, Error>;
+
+  /**
+   * Perform a side effect with the error value without transforming it.
+   * Useful for error reporting within a chain.
+   */
+  tapErr(sideEffect: (error: Error) => void): Result<Value, Error>;
+
+  /**
+   * Exhaustive pattern matching — handle both Ok and Err cases.
+   * TypeScript ensures you cover both branches.
+   */
   match<Output>(handlers: {
     ok: (value: Value) => Output;
     err: (error: Error) => Output;
   }): Output;
+
+  /** Extract the value. Throws if this is an Err. */
   unwrap(): Value;
+
+  /** Extract the value, or return the fallback if this is an Err. */
   unwrapOr(fallback: Value): Value;
+
+  /** Extract the value, or compute a fallback from the error. */
   unwrapOrElse(handleError: (error: Error) => Value): Value;
+
+  /** Type guard — returns true if this is an Ok. */
   isOk(): this is Ok<Value, Error>;
+
+  /** Type guard — returns true if this is an Err. */
   isErr(): this is Err<Value, Error>;
 }
 
 export interface Err<Value = never, Error = unknown> {
   readonly ok: false;
   readonly error: Error;
+
+  /** Transform the success value. Skipped if this is an Err. */
   map<NewValue>(transform: (value: Value) => NewValue): Result<NewValue, Error>;
+
+  /** Transform the error value. Skipped if this is an Ok. */
   mapErr<NewError>(
     transform: (error: Error) => NewError,
   ): Result<Value, NewError>;
+
+  /**
+   * Chain a dependent operation that itself returns a Result.
+   * Useful when the next step can also fail.
+   */
   flatMap<NewValue, NewError>(
     transform: (value: Value) => Result<NewValue, NewError>,
   ): Result<NewValue, Error | NewError>;
+
+  /**
+   * Perform a side effect with the success value without transforming it.
+   * Useful for logging or analytics within a chain.
+   */
+  tap(sideEffect: (value: Value) => void): Result<Value, Error>;
+
+  /**
+   * Perform a side effect with the error value without transforming it.
+   * Useful for error reporting within a chain.
+   */
+  tapErr(sideEffect: (error: Error) => void): Result<Value, Error>;
+
+  /**
+   * Exhaustive pattern matching — handle both Ok and Err cases.
+   * TypeScript ensures you cover both branches.
+   */
   match<Output>(handlers: {
     ok: (value: Value) => Output;
     err: (error: Error) => Output;
   }): Output;
+
+  /** Extract the value. Always throws for Err. */
   unwrap(): never;
+
+  /** Extract the value, or return the fallback if this is an Err. */
   unwrapOr<Fallback>(fallback: Fallback): Fallback;
+
+  /** Extract the value, or compute a fallback from the error. */
   unwrapOrElse<Fallback>(handleError: (error: Error) => Fallback): Fallback;
+
+  /** Type guard — returns true if this is an Ok. */
   isOk(): this is Ok<Value, Error>;
+
+  /** Type guard — returns true if this is an Err. */
   isErr(): this is Err<Value, Error>;
 }
 
@@ -62,6 +134,15 @@ class OkImpl<Value, Error = never> implements Ok<Value, Error> {
     transform: (value: Value) => Result<NewValue, NewError>,
   ): Result<NewValue, Error | NewError> {
     return transform(this.value);
+  }
+
+  tap(sideEffect: (value: Value) => void): Result<Value, Error> {
+    sideEffect(this.value);
+    return this;
+  }
+
+  tapErr(_sideEffect: (error: Error) => void): Result<Value, Error> {
+    return this;
   }
 
   match<Output>(handlers: {
@@ -114,6 +195,15 @@ class ErrImpl<Value = never, Error = unknown> implements Err<Value, Error> {
     return this as unknown as Result<NewValue, Error | NewError>;
   }
 
+  tap(_sideEffect: (value: Value) => void): Result<Value, Error> {
+    return this;
+  }
+
+  tapErr(sideEffect: (error: Error) => void): Result<Value, Error> {
+    sideEffect(this.error);
+    return this;
+  }
+
   match<Output>(handlers: {
     ok: (value: Value) => Output;
     err: (error: Error) => Output;
@@ -144,10 +234,12 @@ class ErrImpl<Value = never, Error = unknown> implements Err<Value, Error> {
   }
 }
 
+/** Create a successful Result containing a value. */
 export function ok<Value>(value: Value): Ok<Value, never> {
   return new OkImpl(value);
 }
 
+/** Create a failed Result containing an error. */
 export function err<Error>(error: Error): Err<never, Error> {
   return new ErrImpl(error);
 }
