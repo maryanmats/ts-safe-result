@@ -14,7 +14,7 @@ Every modern language has solved this: Rust has `Result`, Go has error values, S
 
 `ts-safe-result` brings typed errors to TypeScript — **zero dependencies, under 1KB, fully tree-shakable**.
 
-> **Read the full philosophy:** [Stop Writing try/catch — Your TypeScript Errors Deserve Types](https://maryanmats.dev/blog/try-catch-typed-errors)
+> **Read the full philosophy:** [Stop Writing try/catch — Your TypeScript Errors Deserve Types](https://maryanmats.dev/blog/stop-writing-try-catch-in-typescript)
 
 ## Install
 
