@@ -20,6 +20,12 @@ Every modern language has solved this: Rust has `Result`, Go has error values, S
 
 ```bash
 npm install ts-safe-result
+# or
+pnpm add ts-safe-result
+# or
+yarn add ts-safe-result
+# or
+bun add ts-safe-result
 ```
 
 ## Quick Start
